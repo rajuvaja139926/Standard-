@@ -1,0 +1,19 @@
+{
+  "summary": "Backend core APIs passed; frontend home, hotel listing, sorting, detail, and auth gate rendered, but checkout navigation exposed a React runtime crash.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [{"component": "Checkout/Auth route effects", "issue": "React runtime overlay shows `destroy is not a function` after auth navigation; checkout and confirmation flow cannot continue.", "selector": "[data-testid=auth-submit-button]", "priority": "CRITICAL"}],
+    "integration_issues": [{"flow": "Login → checkout → demo booking", "issue": "Flow stops after login because useEffect cleanup receives Axios Promise and crashes during component unmount.", "affected_selectors": ["[data-testid=auth-submit-button]", "[data-testid=checkout-checkin-input]", "[data-testid=pay-now-button]"]}],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": ["Wrap all API calls in useEffect callbacks with async functions and do not return the Axios Promise; fix Detail, Checkout, Success, Hotels, Bookings effects and retest full booking flow."],
+  "critical_code_review_comments": ["App.js has multiple `useEffect(()=>api.get(...),[])` patterns; React interprets the returned Promise as an effect destructor, causing the observed `destroy is not a function` crash."],
+  "updated_files": ["/app/backend/tests/backend_test.py", "/app/test_reports/iteration_1.json"],
+  "success_rate": {"backend": "100%", "frontend": "50%"},
+  "seed_data_creation": "Created one confirmed QA booking for admin via API using future dates; paymentStatus is demo.",
+  "retest_needed": true,
+  "should_call_test_agent_after_fix": true,
+  "context_for_next_testing_agent": "Home, seeded 10-hotel listing, sort, detail, and auth gate passed. Booking UI, receipt download, my bookings UI, and mobile overflow were not completed because runtime crash occurred.",
+  "rca of the issue": "In App.js, Hotels, Detail, Checkout, Success, and Bookings use effects whose concise arrow body returns `api.get(...)`. Axios returns a Promise; React 19 development cleanup invokes it as a function on unmount, producing `destroy is not a function`. Use a braced effect body with an inner async call and no returned Promise."
+}

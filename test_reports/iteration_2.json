@@ -1,0 +1,22 @@
+{
+  "summary": "Retested backend and frontend booking flow after effect cleanup fixes. Home, collection, sorting, detail, auth gate, and mobile layout passed; login from protected checkout incorrectly redirects to home, blocking checkout and booking UI.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [{"endpoint": "/api/bookings", "issue": "Regression test receives 409 because its fixed 2099 dates collide with a booking created by an earlier run; test data is not idempotent."}]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [{"flow": "Protected checkout login", "issue": "After selecting a room while logged out, submitting valid admin credentials navigates to '/' instead of returning to /checkout/hotel-1/hotel-1-room-1. Checkout inputs and payment button never appear, so booking, confirmation, receipt, and My bookings UI could not be completed.", "affected_selectors": ["[data-testid=auth-submit-button]", "[data-testid=checkout-checkin-input]", "[data-testid=pay-now-button]"]}],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results_iter2.xml"],
+  "action_items": ["Preserve the intended checkout destination through Auth and navigate back to it after successful login (or render checkout after authentication).", "Make booking regression dates unique or clean up the created booking so repeated test runs do not conflict."],
+  "critical_code_review_comments": ["Auth always calls nav('/') after login; when Auth is rendered by the protected checkout route this discards the hotel and room route parameters, making the primary purchase flow unreachable."],
+  "updated_files": ["/app/test_reports/iteration_2.json"],
+  "success_rate": {"backend": "67% suite pass (2/3; core endpoints passed, one fixed-date collision)", "frontend": "67% covered flows passed; checkout flow blocked after auth"},
+  "seed_data_creation": "No new seed data created during this iteration; an earlier QA admin booking remains in the database and caused the fixed-date regression collision.",
+  "retest_needed": true,
+  "should_call_test_agent_after_fix": true,
+  "context_for_next_testing_agent": "Home, collection, price sorting, detail, auth gate, and mobile menu/overflow were verified. Retest login from /checkout/:hotelId/:roomId, then payment, confirmation, receipt download, and My bookings after redirect fix.",
+  "rca of the issue": "Auth receives no return-path information and unconditionally executes nav('/'). The protected checkout route replaces Checkout with Auth when user is absent, so successful login changes location to the homepage rather than restoring the original checkout URL."
+}

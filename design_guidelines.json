@@ -1,0 +1,80 @@
+{
+  "app_name": "HOTELBOOK",
+  "app_type": "hybrid_fullstack",
+  "theme": {
+    "mode": "light",
+    "primary_color": "#0F172A",
+    "brand_color": "#D97706",
+    "accent_color": "#0284C7",
+    "background_color": "#F8FAFC",
+    "surface_color": "#FFFFFF",
+    "text_primary": "#0F172A",
+    "text_secondary": "#64748B",
+    "border_color": "#E2E8F0"
+  },
+  "typography": {
+    "font_family_heading": "Outfit, sans-serif",
+    "font_family_body": "Inter, sans-serif",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight font-extrabold",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-bold",
+      "h3": "text-xl sm:text-2xl font-semibold",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base text-slate-600",
+      "small": "text-sm text-slate-500"
+    }
+  },
+  "colors": {
+    "primary": "#0F172A",
+    "brand": "#D97706",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "danger": "#EF4444",
+    "neutral_light": "#F8FAFC",
+    "neutral_dark": "#0F172A",
+    "card_bg": "#FFFFFF",
+    "glass_bg": "rgba(255, 255, 255, 0.85)"
+  },
+  "visual_enhancers": {
+    "shadows": [
+      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+    ],
+    "border_radius": "rounded-xl",
+    "glassmorphism": "backdrop-blur-xl bg-white/80 border border-white/20 shadow-lg",
+    "textures": "Subtle dot matrix and warm radial gradients"
+  },
+  "grids": {
+    "hero_bento": "grid grid-cols-1 md:grid-cols-12 gap-6",
+    "dashboard_grid": "grid grid-cols-1 md:grid-cols-4 gap-6",
+    "hotel_listings": "grid grid-cols-1 md:grid-cols-3 gap-8"
+  },
+  "layouts": {
+    "container_padding": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8",
+    "flex_between": "flex items-center justify-between",
+    "sticky_header": "sticky top-0 z-50 backdrop-blur-xl bg-white/90 border-b border-slate-200"
+  },
+  "motion": {
+    "transition_defaults": "transition-all duration-200 ease-in-out",
+    "hover_lift": "hover:-translate-y-1 hover:shadow-xl",
+    "button_press": "active:scale-95"
+  },
+  "accessibility": {
+    "contrast_ratio_min": "4.5:1 for normal text, 3:1 for large text",
+    "focus_states": "focus:ring-2 focus:ring-amber-500 focus:outline-none",
+    "aria_labels": "MANDATORY on all icon buttons and interactive elements",
+    "test_ids": "MANDATORY `data-testid` on all buttons, links, inputs, cards, and interactive components"
+  },
+  "image_urls": {
+    "hero_pool": "https://images.unsplash.com/photo-1783323011343-0c9efecec40c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXNvcnQlMjBob3RlbCUyMGV4dGVyaW9yJTIwcG9vbHxlbnwwfHx8fDE3ODM1OTY1NDN8MA&ixlib=rb-4.1.0&q=85",
+    "resort_aerial": "https://images.unsplash.com/photo-1776763255480-014a64ee137d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHw0fHxsdXh1cnklMjByZXNvcnQlMjBob3RlbCUyMGV4dGVyaW9yJTIwcG9vbHxlbnwwfHx8fDE3ODM1OTY1NDN8MA&ixlib=rb-4.1.0&q=85",
+    "pool_greenery": "https://images.unsplash.com/photo-1780283574760-e8d7fd944da5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjByZXNvcnQlMjBob3RlbCUyMGV4dGVyaW9yJTIwcG9vbHxlbnwwfHx8fDE3ODM1OTY1NDN8MA&ixlib=rb-4.1.0&q=85",
+    "beach_resort": "https://images.unsplash.com/photo-1776761731160-8cc734210e71?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwyfHxsdXh1cnklMjByZXNvcnQlMjBob3RlbCUyMGV4dGVyaW9yJTIwcG9vbHxlbnwwfHx8fDE3ODM1OTY1NDN8MA&ixlib=rb-4.1.0&q=85",
+    "suite_bedroom": "https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHN1aXRlJTIwaW50ZXJpb3IlMjBiZWRyb29tJTIwbHV4dXJ5fGVufDB8fHx8MTc4ODEwNDk1M3ww&ixlib=rb-4.1.0&q=85",
+    "suite_desk": "https://images.unsplash.com/photo-1742821855309-d26c83bdfe1d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHw0fHxob3RlbCUyMHN1aXRlJTIwaW50ZXJpb3IlMjBiZWRyb29tJTIwbHV4dXJ5fGVufDB8fHx8MTc4ODEwNDk1M3ww&ixlib=rb-4.1.0&q=85",
+    "suite_window": "https://images.unsplash.com/photo-1578898886225-c7c894047899?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwyfHxob3RlbCUyMHN1aXRlJTIwaW50ZXJpb3IlMjBiZWRyb29tJTIwbHV4dXJ5fGVufDB8fHx8MTc4ODEwNDk1M3ww&ixlib=rb-4.1.0&q=85",
+    "lobby_dining": "https://images.unsplash.com/photo-1585418694458-dc80a5c20294?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwyfHxib3V0aXF1ZSUyMGhvdGVsJTIwbG9iYnklMjBkaW5pbmclMjBzcGF8ZW58MHx8fHwxNzg4MTA0OTUzfDA&ixlib=rb-4.1.0&q=85",
+    "lobby_lounge": "https://images.unsplash.com/photo-1664174728312-47aad71055c5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxib3V0aXF1ZSUyMGhvdGVsJTIwbG9iYnklMjBkaW5pbmclMjBzcGF8ZW58MHx8fHwxNzg4MTA0OTUzfDA&ixlib=rb-4.1.0&q=85"
+  },
+  "instructions_to_main_agent": "Implement full HOTEL BOOKING SYSTEM (HOTELBOOK) with JWT auth, hotel search, filters, room selector, backend-validated price calculation, demo payment / Razorpay flow, PDF receipt generator, user bookings with cancellation, reviews & ratings, admin dashboard with CRUD for hotels/rooms/bookings/users, and exportable project structure. Ensure all interactive elements include `data-testid` attributes."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "hotel-booking-system-mern",
+  "private": true,
+  "scripts": {
+    "install-all": "cd server && pip install -r requirements.txt && cd ../client && yarn",
+    "dev": "echo 'Run the supported workspace services, or start client and server using their READMEs'"
+  }
+}
