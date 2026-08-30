@@ -7,6 +7,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional
 from pathlib import Path
 import os, uuid, jwt, bcrypt, logging
+import razorpay
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -15,6 +16,9 @@ client = AsyncIOMotorClient(mongo_url); db = client[db_name]
 app = FastAPI(title='HOTELBOOK API', version='1.0.0', docs_url='/api-docs')
 api = APIRouter(prefix='/api')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'hotelbook-development-secret')
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '').strip()
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '').strip()
+razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)) if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET else None
 
 IMAGES = [
  'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1200&q=85',
@@ -65,6 +69,11 @@ class BookingIn(BaseModel):
     hotelId: str; roomId: str; checkIn: str; checkOut: str; guests: int = 1
     guestName: str; guestEmail: EmailStr; guestPhone: str
 class ReviewIn(BaseModel): hotelId: str; rating: int = Field(ge=1, le=5); comment: str
+class PaymentCreate(BookingIn): pass
+class PaymentVerify(PaymentCreate):
+    razorpayOrderId: str
+    razorpayPaymentId: str
+    razorpaySignature: str
 
 @app.on_event('startup')
 async def seed():
@@ -120,6 +129,41 @@ async def hotel_detail(hotel_id: str):
     hotel=clean(await db.hotels.find_one({'id':hotel_id},{'_id':0}))
     if not hotel: raise HTTPException(404,'Hotel not found')
     hotel['rooms']=await db.rooms.find({'hotelId':hotel_id},{'_id':0}).to_list(20); hotel['reviewsList']=await db.reviews.find({'hotelId':hotel_id},{'_id':0}).sort('createdAt',-1).to_list(20); return hotel
+
+@api.get('/payments/config')
+async def payment_config():
+    return {'razorpayEnabled': bool(razorpay_client), 'keyId': RAZORPAY_KEY_ID if razorpay_client else None, 'mode': 'razorpay' if razorpay_client else 'demo'}
+
+@api.post('/payments/create-order')
+async def create_payment_order(data: PaymentCreate, user=Depends(current_user)):
+    if not razorpay_client: raise HTTPException(503, 'Razorpay is not configured; use demo payment')
+    hotel=await db.hotels.find_one({'id':data.hotelId},{'_id':0}); room=await db.rooms.find_one({'id':data.roomId},{'_id':0})
+    if not hotel or not room: raise HTTPException(404,'Hotel or room not found')
+    nights=(datetime.fromisoformat(data.checkOut)-datetime.fromisoformat(data.checkIn)).days
+    if nights<1: raise HTTPException(400,'Check-out must be after check-in')
+    subtotal=room['pricePerNight']*nights; total=round(subtotal*1.17)
+    try:
+        order=razorpay_client.order.create({'amount': total*100, 'currency':'INR', 'receipt':f'HB-{uuid.uuid4().hex[:12]}', 'payment_capture':1})
+    except Exception as exc:
+        logging.exception('Razorpay order creation failed')
+        raise HTTPException(502, f'Razorpay order creation failed: {exc}')
+    await db.payments.insert_one({'id':str(uuid.uuid4()),'orderId':order['id'],'userId':user['id'],'amount':total,'currency':'INR','status':'created','paymentMethod':'razorpay','createdAt':datetime.now(timezone.utc).isoformat()})
+    return {'orderId':order['id'],'amount':total*100,'currency':'INR','keyId':RAZORPAY_KEY_ID}
+
+@api.post('/payments/verify')
+async def verify_payment(data: PaymentVerify, user=Depends(current_user)):
+    if not razorpay_client: raise HTTPException(503, 'Razorpay is not configured; use demo payment')
+    payment = await db.payments.find_one({'orderId':data.razorpayOrderId,'userId':user['id'],'status':'created'},{'_id':0})
+    if not payment: raise HTTPException(404, 'Razorpay order not found for this account')
+    try:
+        razorpay_client.utility.verify_payment_signature({'razorpay_order_id':data.razorpayOrderId,'razorpay_payment_id':data.razorpayPaymentId,'razorpay_signature':data.razorpaySignature})
+    except Exception:
+        raise HTTPException(400, 'Razorpay payment signature verification failed')
+    booking=await create_booking(PaymentCreate(**data.model_dump(exclude={'razorpayOrderId','razorpayPaymentId','razorpaySignature'})), user)
+    if booking['totalAmount'] != payment['amount']: raise HTTPException(400, 'Payment amount does not match the booking total')
+    await db.bookings.update_one({'id':booking['id']},{'$set':{'paymentStatus':'paid','paymentMethod':'razorpay','razorpayOrderId':data.razorpayOrderId,'razorpayPaymentId':data.razorpayPaymentId}})
+    await db.payments.update_one({'orderId':data.razorpayOrderId},{'$set':{'bookingId':booking['id'],'paymentId':data.razorpayPaymentId,'status':'paid'}})
+    booking['paymentStatus']='paid'; booking['paymentMethod']='razorpay'; return booking
 
 @api.post('/bookings')
 async def create_booking(data: BookingIn, user=Depends(current_user)):

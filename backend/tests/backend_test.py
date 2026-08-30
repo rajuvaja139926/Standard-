@@ -28,3 +28,21 @@ def test_booking_validation_and_demo_booking():
     assert b['nights'] == 3 and b['subtotal'] == 555 and b['paymentStatus'] == 'demo'
     assert b['totalAmount'] == 649.35
     assert any(x['id'] == b['id'] for x in s.get(f'{BASE_URL}/api/bookings/my').json())
+
+def test_razorpay_demo_config_and_protected_fallbacks():
+    config = requests.get(f'{BASE_URL}/api/payments/config')
+    assert config.status_code == 200
+    assert config.json() == {'razorpayEnabled': False, 'keyId': None, 'mode': 'demo'}
+
+    payload = {'hotelId':'hotel-1','roomId':'hotel-1-room-1','checkIn':'2099-07-10','checkOut':'2099-07-13','guests':1,'guestName':'QA','guestEmail':'admin@hotelbook.com','guestPhone':'9999999999'}
+    unauth_order = requests.post(f'{BASE_URL}/api/payments/create-order', json=payload)
+    assert unauth_order.status_code == 401
+    unauth_verify = requests.post(f'{BASE_URL}/api/payments/verify', json={**payload, 'razorpayOrderId':'x','razorpayPaymentId':'y','razorpaySignature':'z'})
+    assert unauth_verify.status_code == 401
+
+    s = requests.Session()
+    assert s.post(f'{BASE_URL}/api/auth/login', json={'email':'admin@hotelbook.com','password':'Hotelbook@123'}).status_code == 200
+    order = s.post(f'{BASE_URL}/api/payments/create-order', json=payload)
+    assert order.status_code == 503 and 'demo payment' in order.json()['detail'].lower()
+    verify = s.post(f'{BASE_URL}/api/payments/verify', json={**payload, 'razorpayOrderId':'x','razorpayPaymentId':'y','razorpaySignature':'z'})
+    assert verify.status_code == 503 and 'demo payment' in verify.json()['detail'].lower()

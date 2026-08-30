@@ -19,6 +19,7 @@ Build a complete HOTELBOOK hotel booking system with search, filters, hotel deta
 - Built responsive HOTELBOOK UI with home, collection, detail, auth, checkout, confirmation, bookings, and about views.
 
 ## Backlog
-- P0: Full admin CRUD screens and Razorpay verification wiring.
+- P0: Full admin CRUD screens.
+- P1: Optional Razorpay order creation and signature verification are now wired behind empty credentials; enable with Razorpay test keys.
 - P1: Cloudinary uploads, richer PDF binary generation, booking cancellation UI and review composer.
 - P2: Monthly charts, pagination, password reset, contact form, production rate limiting.
